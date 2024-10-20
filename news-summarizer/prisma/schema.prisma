@@ -1,11 +1,32 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+model User {
+  uid Int @id @default(autoincrement())
+  email String @unique
+  first_name String
+  last_name String
 
-generator client {
-  provider = "prisma-client-js"
+  @@index(fields: [email])
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+model GeneartedHeadline {
+  gid Int @id @default(autoincrement())
+  headline_text String
+  sentiment Float
+  last_touched DateTime
+  tid Int
+  topic Topic @relation(fields: [tid], references: [tid])
+}
+
+model RawHeadline {
+  rid Int @id @default(autoincrement())
+  headline_text String
+  last_touched DateTime
+  group Int
+
+   @@index([last_touched, group])
+}
+
+model Topic {
+  tid Int @id @default(autoincrement())
+  topic_type String @unique
+  generated_headlines GeneartedHeadline[]
 }
