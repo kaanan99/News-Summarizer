@@ -28,6 +28,7 @@ model GeneartedHeadline {
 model RawHeadline {
   rid Int @id @default(autoincrement())
   headline_text String
+  headline_url String
   last_touched DateTime
   group Int
 
