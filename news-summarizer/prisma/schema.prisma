@@ -12,31 +12,44 @@ model UserAccount {
   email String @unique
   first_name String
   last_name String
+  is_active Boolean @default(true)
 
   @@index(fields: [email])
+  @@index(fields: [is_active])
 }
 
 model GeneartedHeadline {
   gid Int @id @default(autoincrement())
   headline_text String
   sentiment Float
-  last_touched DateTime
+  date_added DateTime
   tid Int
-  topic Topic @relation(fields: [tid], references: [tid])
+  topic_relation Topic @relation(fields: [tid], references: [tid])
+  group Int
+
+  @@index([date_added])
+  @@index([date_added, tid])
+  @@index([date_added, tid, group])
 }
 
 model RawHeadline {
   rid Int @id @default(autoincrement())
   headline_text String
   headline_url String
-  last_touched DateTime
+  date_added DateTime
+  tid Int
+  // topic_relation Topic @relation(fields: [tid], references: [tid])
   group Int
 
-   @@index([last_touched, group])
+  @@index([date_added])
+  @@index([date_added, tid])
+  @@index([date_added, tid, group])
 }
 
 model Topic {
   tid Int @id @default(autoincrement())
   topic_type String @unique
-  generated_headlines GeneartedHeadline[]
+  topic_key String @unique
+  generated_headlines_relation GeneartedHeadline[]
+  // raw_headline_relation RawHeadline[]
 }
