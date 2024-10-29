@@ -21,10 +21,9 @@ model UserAccount {
 model GeneartedHeadline {
   gid Int @id @default(autoincrement())
   headline_text String
-  sentiment Float
   date_added DateTime
   tid Int
-  topic_relation Topic @relation(fields: [tid], references: [tid])
+  // topic_relation Topic @relation(fields: [tid], references: [tid])
   group Int
 
   @@index([date_added])
@@ -50,6 +49,6 @@ model Topic {
   tid Int @id @default(autoincrement())
   topic_type String @unique
   topic_key String @unique
-  generated_headlines_relation GeneartedHeadline[]
+  // generated_headlines_relation GeneartedHeadline[]
   // raw_headline_relation RawHeadline[]
 }
