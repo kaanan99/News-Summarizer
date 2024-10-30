@@ -51,4 +51,6 @@ model Topic {
   topic_key String @unique
   // generated_headlines_relation GeneartedHeadline[]
   // raw_headline_relation RawHeadline[]
+
+  @@index([topic_type])
 }
