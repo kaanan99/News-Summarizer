@@ -9,9 +9,10 @@ export const GET = async (req: Request) => {
         const parsed_body = getSchema.parse({
             date_added: url.searchParams.get('date_added'),
             tid: url.searchParams.get('tid'),
-            group: url.searchParams.get('group'),
+            group: url.searchParams.get('group') || undefined,
         });
         const dateAdded = new Date(parsed_body.date_added);
+
         const rawHeadlines = await prisma.rawHeadline.findMany(
             {
                 where: {

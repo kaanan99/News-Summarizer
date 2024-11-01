@@ -42,9 +42,19 @@ export const POST = async (req: Request) => {
         const parsed_body = postSchema.parse(body)
         const dateAdded = new Date(parsed_body.date_added);
 
-        const newGenHeadline = await prisma.geneartedHeadline.create(
+        const newGenHeadline = await prisma.geneartedHeadline.upsert(
             {
-                data: {
+                where: {
+                    headline_text_date_added :{
+                        headline_text: parsed_body.headline_text,
+                        date_added: dateAdded,
+                    }
+                },
+                update:{
+                    tid: parsed_body.tid,
+                    group: parsed_body.group,
+                },
+                create: {
                     headline_text: parsed_body.headline_text,
                     date_added: dateAdded,
                     tid: parsed_body.tid,

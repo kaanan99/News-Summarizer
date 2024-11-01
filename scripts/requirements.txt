@@ -1,0 +1,5 @@
+GoogleNews==1.6.15
+openai==1.51.2
+sentence-transformers==3.2.0
+psycopg2
+python-dotenv==1.0.1

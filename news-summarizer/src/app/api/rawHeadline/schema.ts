@@ -5,7 +5,7 @@ const getSchema = z.object({
         message: "Invalid date format. Use YYYY-MM-DD.",
     }),
     tid: z.coerce.number().int().positive(),
-    group: z.coerce.number().int().positive()
+    group: z.coerce.number().int().positive().optional()
 });
 
 const postSchema = z.object({
