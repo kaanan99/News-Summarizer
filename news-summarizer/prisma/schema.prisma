@@ -23,8 +23,10 @@ model GeneartedHeadline {
   headline_text String
   date_added DateTime
   tid Int
-  // topic_relation Topic @relation(fields: [tid], references: [tid])
+  topic_relation Topic @relation(fields: [tid], references: [tid])
   group Int
+
+  @@unique([headline_text, date_added])
 
   @@index([date_added])
   @@index([date_added, tid])
@@ -37,8 +39,10 @@ model RawHeadline {
   headline_url String
   date_added DateTime
   tid Int
-  // topic_relation Topic @relation(fields: [tid], references: [tid])
+  topic_relation Topic @relation(fields: [tid], references: [tid])
   group Int
+
+  @@unique([headline_text, headline_url])
 
   @@index([date_added])
   @@index([date_added, tid])
@@ -49,8 +53,8 @@ model Topic {
   tid Int @id @default(autoincrement())
   topic_type String @unique
   topic_key String @unique
-  // generated_headlines_relation GeneartedHeadline[]
-  // raw_headline_relation RawHeadline[]
+  generated_headlines_relation GeneartedHeadline[]
+  raw_headline_relation RawHeadline[]
 
   @@index([topic_type])
 }

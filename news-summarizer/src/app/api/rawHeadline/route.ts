@@ -42,17 +42,26 @@ export const POST = async (req: Request) => {
         const parsed_body = postSchema.parse(body)
         const dateAdded = new Date(parsed_body.date_added);
 
-        const newRawHeadline = await prisma.rawHeadline.create(
-            {
-                data: {
+        const newRawHeadline = await prisma.rawHeadline.upsert({
+            where: {
+                headline_text_headline_url: {
                     headline_text: parsed_body.headline_text,
                     headline_url: parsed_body.headline_url,
-                    date_added: dateAdded,
-                    tid: parsed_body.tid,
-                    group: parsed_body.group,
-                }
-            }
-        );
+                },
+            },
+            update: {
+                date_added: dateAdded,
+                tid: parsed_body.tid,
+                group: parsed_body.group,
+            },
+            create: {
+                headline_text: parsed_body.headline_text,
+                headline_url: parsed_body.headline_url,
+                date_added: dateAdded,
+                tid: parsed_body.tid,
+                group: parsed_body.group,
+            },
+        });
         return NextResponse.json({
             status: 201,
             message: "Raw Headline added successfully",
