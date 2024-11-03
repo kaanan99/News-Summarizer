@@ -4,8 +4,8 @@ const getSchema = z.object({
     date_added: z.string().refine(date => !isNaN(Date.parse(date)), {
         message: "Invalid date format. Use YYYY-MM-DD.",
     }),
-    tid: z.coerce.number().int().positive(),
-    group: z.coerce.number().int().positive()
+    tid: z.coerce.number().int().positive().optional(),
+    group: z.coerce.number().int().positive().optional()
 });
 
 const postSchema = z.object({
