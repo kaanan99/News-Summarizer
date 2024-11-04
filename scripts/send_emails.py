@@ -31,8 +31,7 @@ def main():
     # Get current date and variations
     current_date = datetime.now()
     date_slash = current_date.strftime("%m/%d/%Y")
-    #date_dash = current_date.strftime("%Y-%m-%d")
-    date_dash = "2024-10-31"
+    date_dash = current_date.strftime("%Y-%m-%d")
 
     # Get sender email and password
     sender_email = os.getenv("EMAIL_USERNAME")
@@ -104,7 +103,7 @@ def main():
 
         header = f"{topic_name} News:"
         body = ""
-        for headline in topic_headlines[topic_id][:10]:
+        for headline in topic_headlines[topic_id]:#[:10]:
             body += f"\n\t- {headline}"
         
         topic_message[topic_id] = header + body
