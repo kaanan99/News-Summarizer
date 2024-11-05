@@ -3,6 +3,8 @@ import requests
 import string
 import smtplib
 
+from exceptions import TopicLoadException, HeadlineLoadException, UserLoadException, NoHeadlinesException
+
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -48,17 +50,14 @@ def main():
     # Get topics
     response = requests.get(f"{api}/topics")
 
-    # If there was an error loading headlines, end the script
+    # If there was an error loading users
     if response.status_code != 200:
-        print("Failed to retrieve content. Status code:", response.status_code)
-        exit()
+        raise TopicLoadException
 
     topics = dict(response.json())["data"]
 
     topic_headlines = {}
     topic_map = {}
-
-    print(topics)
 
     # Map headline and topic name to topic id in dict
     for topic in topics:
@@ -75,13 +74,16 @@ def main():
     # Get Generated Headlines
     response = requests.get(f"{api}/generatedHeadline?date_added={date_dash}")
 
-    # If there was an error loading headlines, end the script
+    # If there was an error loading headlines
     if response.status_code != 200:
-        print("Failed to retrieve content. Status code:", response.status_code)
-        exit()
+        raise HeadlineLoadException
 
     # Extract the information for each topic
     headlines = dict(response.json())["data"]
+
+    # If there are no headlines, don't send any emails
+    if len(headlines) == 0:
+        raise NoHeadlinesException
 
     for headline in headlines:
         topic_id = headline["tid"]
@@ -115,10 +117,9 @@ def main():
     # Get users that are active
     response = requests.get(f"{api}//users?is_active=true")
 
-    # If there was an error loading headlines, end the script
+    # If there was an error loading users
     if response.status_code != 200:
-        print("Failed to retrieve content. Status code:", response.status_code)
-        exit()
+        raise UserLoadException
 
     users = dict(response.json())["data"]
 

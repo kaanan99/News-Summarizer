@@ -3,6 +3,7 @@ import requests
 
 from datetime import datetime
 
+from exceptions import TopicLoadException
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -42,8 +43,7 @@ def main():
     
     # If there was an error loading topics, end the script
     if response.status_code != 200:
-        print("Failed to retrieve content. Status code:", response.status_code)
-        exit()
+        raise TopicLoadException
 
     
     # Extract the information for each topic
@@ -69,7 +69,10 @@ def main():
         
         headline_objs = dict(response.json())["data"]
 
-        
+        if len(headline_objs) == 0:
+            print(f"No raw headlines for topic id: {topic_id}")
+            continue
+
         # Combine headlines within a group
         groups = {}
         for obj in headline_objs:

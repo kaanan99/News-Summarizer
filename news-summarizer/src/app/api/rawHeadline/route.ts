@@ -8,7 +8,7 @@ export const GET = async (req: Request) => {
         const url = new URL(req.url);
         const parsed_body = getSchema.parse({
             date_added: url.searchParams.get('date_added'),
-            tid: url.searchParams.get('tid'),
+            tid: url.searchParams.get('tid') || undefined,
             group: url.searchParams.get('group') || undefined,
         });
         const dateAdded = new Date(parsed_body.date_added);

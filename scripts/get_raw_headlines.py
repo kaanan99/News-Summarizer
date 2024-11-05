@@ -3,6 +3,8 @@ import requests
 
 from datetime import datetime
 
+from exceptions import TopicLoadException
+
 from dotenv import load_dotenv
 from GoogleNews import GoogleNews
 from sentence_transformers import SentenceTransformer, util
@@ -23,8 +25,7 @@ def main():
     
     # If there was an error loading topics, end the script
     if response.status_code != 200:
-        print("Failed to retrieve content. Status code:", response.status_code)
-        exit()
+        raise TopicLoadException
 
     # Extract the information for each topic
     topic_data = dict(response.json())["data"]
