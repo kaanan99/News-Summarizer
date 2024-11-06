@@ -10,7 +10,7 @@ export const GET = async (req: Request) => {
 
         const parsedBody = baseTopicSchema.parse(params);
         let topic;
-        if (parsedBody) {
+        if (Object.keys(parsedBody).length > 0) {
             topic = await prisma.topic.findFirst({
                 where: { topic_type: parsedBody.topic_type }
             });
