@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const baseTopicSchema = z.object({
-    topic_type: z.string().min(1, "Topic type is required").optional()
+    topic_type: z.string().min(1, "Topic type is required")
 });
 
 const createTopicSchema = z.object({

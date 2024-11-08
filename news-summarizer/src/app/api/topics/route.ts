@@ -1,18 +1,26 @@
 import { NextResponse } from "next/server";
+import { z } from 'zod';
 import prisma from "../../../../prisma/prisma";
 import { baseTopicSchema, createTopicSchema } from "./schema";
-
 
 export const GET = async (req: Request) => {
     try {
         const url = new URL(req.url);
         const params = Object.fromEntries(url.searchParams);
 
-        const parsedBody = baseTopicSchema.parse(params);
+        let parsedParams;
+        // Only parse if topic_type is present in params
+        if (params.topic_type) {
+            parsedParams = baseTopicSchema.parse(params);
+        } else {
+            parsedParams = {};
+        }
+
         let topic;
-        if (Object.keys(parsedBody).length > 0) {
+        // Filter by optional topic_type param if provided
+        if (Object.keys(parsedParams).length > 0) {
             topic = await prisma.topic.findFirst({
-                where: { topic_type: parsedBody.topic_type }
+                where: { topic_type: parsedParams.topic_type }
             });
         } else {
             topic = await prisma.topic.findMany();
@@ -54,19 +62,38 @@ export const POST = async (req: Request) => {
         },
         { status: 201});
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            // Handle Zod validation errors
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
+        }
+
         console.error("Error creating topic:", error);
-        return new NextResponse("Failed to create topic", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Error creating topic",
+            errors: error,
+        },
+        { status: 500 });
     }
 };
 
 export const DELETE = async (req: Request) => {
     try {
-        const url = new URL(req.url);
-        const params = Object.fromEntries(url.searchParams);
-        const parsedBody = baseTopicSchema.parse(params);
+        const body = await req.json();
+        const parsed_body = baseTopicSchema.parse(body);
 
         const deleted_topic = await prisma.topic.delete({
-            where: { topic_type: parsedBody.topic_type }
+            where: { topic_type: parsed_body.topic_type }
         });
 
         return NextResponse.json({
@@ -75,7 +102,27 @@ export const DELETE = async (req: Request) => {
             data: deleted_topic,
         });
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            // Handle Zod validation errors
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
+        }
+
         console.error("Error deleting topic:", error);
-        return new NextResponse("Failed to delete topic", { status: 500 });
+        return NextResponse.json({
+                status: 500,
+                message: "Error deleting topic",
+                errors: error,
+        },
+        { status: 500 });
     }
 };
