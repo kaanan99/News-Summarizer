@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { z } from 'zod';
 import prisma from "../../../../prisma/prisma";
@@ -41,7 +42,7 @@ export const GET = async (req: Request) => {
             );
         }
     } catch (error) {
-        console.error("Error fetching topic:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Error fetching topic",
@@ -82,7 +83,7 @@ export const POST = async (req: Request) => {
             { status: 400 });
         }
 
-        console.error("Error creating topic:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Error creating topic",
@@ -122,7 +123,7 @@ export const DELETE = async (req: Request) => {
             { status: 400 });
         }
 
-        console.error("Error deleting topic:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
                 status: 500,
                 message: "Error deleting topic",

@@ -38,3 +38,6 @@ next-env.d.ts
 .next
 
 .env
+
+# sentry
+.env.sentry-build-plugin
