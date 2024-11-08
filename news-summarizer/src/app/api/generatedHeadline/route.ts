@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { ZodError } from 'zod';
 import prisma from "../../../../prisma/prisma";
@@ -40,7 +41,7 @@ export const GET = async (req: Request) => {
             },
             { status: 400 });
         }
-        console.error("Error fetching generated headlines:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to fetch generated headlines",
@@ -96,7 +97,7 @@ export const POST = async (req: Request) => {
             },
             { status: 400 });
         }
-        console.error("Error adding generated headline:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to add generated headline",
@@ -143,7 +144,7 @@ export const PATCH = async (req: Request) => {
             },
             { status: 400 });
         }
-        console.error("Error updating generated headline:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to update generated headline",
@@ -185,7 +186,7 @@ export const DELETE =async (req:Request) => {
             },
             { status: 400 });
         }
-        console.error("Error deleting generated headline:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to delete generated headline",
