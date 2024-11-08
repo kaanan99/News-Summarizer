@@ -6,6 +6,7 @@ from datetime import datetime
 from exceptions import TopicLoadException
 from dotenv import load_dotenv
 from openai import OpenAI
+from zoneinfo import ZoneInfo
 
 
 def generate_summary(headlines, system_message, client, model="gpt-4o-mini"):
@@ -23,7 +24,7 @@ def generate_summary(headlines, system_message, client, model="gpt-4o-mini"):
 
 def main():
     # Get current date and variations
-    current_date = datetime.now()
+    current_date = datetime.now(ZoneInfo('America/Los_Angeles'))
     date_dash = current_date.strftime("%Y-%m-%d")
     
     # Get API

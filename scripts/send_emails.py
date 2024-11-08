@@ -12,6 +12,9 @@ import requests
 from datetime import datetime
 import string
 from dotenv import load_dotenv
+from email.mime.text import MIMEText
+import base64
+from zoneinfo import ZoneInfo
 
 # Define SCOPES for sending email
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -43,10 +46,39 @@ def authenticate_gmail():
     service = build('gmail', 'v1', credentials=creds)
     return service
 
+def create_html(header, headlines):
+    headlines_html = ''.join(f"<li>{point}</li>" for point in headlines)
+    html_section = f"""
+    <div style="margin: 20px 0;">
+        <h2 style="font-size: 1.5em; color: #333;">{header}</h2>
+        <ul style="margin-left: 20px; list-style-type: disc;">
+            {headlines_html}
+        </ul>
+    </div>
+    """
+    return html_section
+
+def create_email_body(header, htmls):
+    main_header = f"""
+    <h1 style="text-align: center; font-size: 2em; color: #007BFF; margin-top: 20px;">
+        {header}
+    </h1>
+    """
+    message = "".join(htmls)
+    full_html = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+            {main_header}
+            {message}
+            <p style="text-align: center; margin-top: 30px;">Thank you for staying updated!</p>
+        </body>
+    </html>
+    """
+    return full_html
+
 def create_message(sender, to, subject, message_text):
-    from email.mime.text import MIMEText
-    import base64
-    message = MIMEText(message_text, 'plain')
+    
+    message = MIMEText(message_text, 'html')
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
@@ -60,18 +92,18 @@ def send_email(service, sender, to, subject, message_text):
         print(f"Message sent: {message['id']}")
         return message
     except Exception as error:
-        print(f"An error occurred: {error}")
+        print(f"An error occurred while sending an email to {message['id']}: {error}")
+
 
 def main():
     # Get current date and variations
-    current_date = datetime.now()
+    current_date = datetime.now(ZoneInfo('America/Los_Angeles'))
     date_slash = current_date.strftime("%m/%d/%Y")
     date_dash = current_date.strftime("%Y-%m-%d")
 
     # Load .env file and get environment variables
     load_dotenv()
     sender_email = os.getenv("SENDER_EMAIL")
-    sender_password = os.getenv("SENDER_PASSWORD")
     api = os.getenv("API")
 
     # Get Topics
@@ -105,7 +137,7 @@ def main():
         topic_id = headline["tid"]
         topic_headlines[topic_id].append(headline["headline_text"])
 
-    # Generate bodies for each topic:
+    # Generate HTML bodies for each topic:
     topic_message = {}
     for topic_id in topic_map.keys():
         topic_name = topic_map[topic_id]
@@ -115,11 +147,8 @@ def main():
             topic_name = string.capwords(topic_name)
 
         header = f"{topic_name} News:"
-        body = ""
-        for headline in topic_headlines[topic_id]:
-            body += f"\n\t- {headline}"
-
-        topic_message[topic_id] = header + body
+        headlines = topic_headlines[topic_id]
+        topic_message[topic_id] = create_html(header, headlines)
 
     # Get users that are active
     response = requests.get(f"{api}/users?is_active=true")
@@ -128,19 +157,21 @@ def main():
         return
     users = dict(response.json())["data"]
 
-    service = authenticate_gmail()  # Authenticate and get Gmail API service
+    # Authenticate and get Gmail API service
+    service = authenticate_gmail()  
 
     for user in users:
         name = user["first_name"]
         email = user["email"]
-        user_topics = topic_message.keys()
+
+        user_topics = topic_message.keys() # This is hard coded to include all the topics for now
         subject = f"News for {date_slash}"
-        body = f"Hi {name}, here is your news for {date_slash}!"
+        email_header = f"Hi {name}, here is your news for {date_slash}!"
+        topics_content = [topic_message[topic_id] for topic_id in user_topics]
+        email_body = create_email_body(email_header, topics_content)
         
-        for topic in user_topics:
-            body += f"\n\n{topic_message[topic]}"
-        
-        send_email(service, sender_email, email, subject, body)
+        send_email(service, sender_email, email, subject, email_body)
+
 
 if __name__ == "__main__":
     main()

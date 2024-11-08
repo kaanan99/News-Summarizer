@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 
 from exceptions import TopicLoadException
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from GoogleNews import GoogleNews
@@ -12,7 +13,7 @@ from sentence_transformers import SentenceTransformer, util
 
 def main():
     # Get current date and variations
-    current_date = datetime.now()
+    current_date = datetime.now(ZoneInfo('America/Los_Angeles'))
     date_slash = current_date.strftime("%m/%d/%Y")
     date_dash = current_date.strftime("%Y-%m-%d")
 
