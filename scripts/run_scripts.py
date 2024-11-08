@@ -18,6 +18,7 @@ def main():
     scripts = ["get_raw_headlines.py", "generate_headline_summaries.py", "send_emails.py"]
 
     for script in scripts:
+        print(f"Running: {script}")
         if not run_script(script):
             print("Stopping further execution due to error.")
             break

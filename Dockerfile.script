@@ -1,0 +1,11 @@
+FROM python:3.12
+
+RUN mkdir scripts
+
+COPY scripts/ scripts/
+
+WORKDIR scripts
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["bash"]
