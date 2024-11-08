@@ -42,7 +42,12 @@ export const GET = async (req: Request) => {
         }
     } catch (error) {
         console.error("Error fetching topic:", error);
-        return new NextResponse("Failed to fetch topic", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Error fetching topic",
+            errors: error,
+        },
+        { status: 500 });
     }
 };
 

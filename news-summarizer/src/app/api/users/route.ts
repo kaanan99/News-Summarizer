@@ -1,19 +1,31 @@
 import { NextResponse } from "next/server";
+import { z } from 'zod';
 import prisma from "../../../../prisma/prisma";
-import { baseUserSchema, createUserSchema, getSchema } from "./schema";
+import { baseUserSchema, createUserSchema, getUserSchema } from "./schema";
 
 export const GET = async (req: Request) => {
     try {
         const url = new URL(req.url);
         const params = Object.fromEntries(url.searchParams);
         
-        const parsedParams = getSchema.parse({
-            is_active: params.is_active === undefined ? undefined : params.is_active === 'true'
-        });
+        let parsedParams;
+        // Only parse if is_active is present in params
+        if (params.is_active) {
+            parsedParams = getUserSchema.parse(params);
+        } else {
+            parsedParams = {};
+        }
 
-        const users = await prisma.userAccount.findMany({
-            where: parsedParams.is_active !== undefined ? { is_active: parsedParams.is_active } : {}
-        });
+        let users;
+        if (Object.keys(parsedParams).length > 0) {
+            users = await prisma.userAccount.findMany(
+                {
+                    where: { is_active: parsedParams.is_active }
+                }
+            );
+        } else {
+            users = await prisma.userAccount.findMany();
+        }
 
         return NextResponse.json({
             status: 200,
@@ -21,8 +33,28 @@ export const GET = async (req: Request) => {
             data: users
         });
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            // Handle Zod validation errors
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
+        }
+
         console.error("Error fetching users:", error);
-        return new NextResponse("Failed to fetch users", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Error fetching users",
+            errors: error,
+        },
+        { status: 500 });
     }
 };
 
@@ -50,8 +82,28 @@ export const POST = async (req: Request) => {
             data: newUser,
         });
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            // Handle Zod validation errors
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
+        }
+
         console.error("Error creating or updating user:", error);
-        return new NextResponse("Failed to create or update user", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Error creating or updating user",
+            errors: error,
+        },
+        { status: 500 });
     }
 };
 
@@ -70,7 +122,27 @@ export const DELETE = async (req: Request) => {
             data: newUser,
         });
     } catch (error) {
-        console.error("Error deleted user:", error);
-        return new NextResponse("Failed to delete user", { status: 500 });
+        if (error instanceof z.ZodError) {
+            // Handle Zod validation errors
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
+        }
+
+        console.error("Error deleting user:", error);
+        return NextResponse.json({
+                status: 500,
+                message: "Error deleting user",
+                errors: error,
+        },
+        { status: 500 });
     }
 };
