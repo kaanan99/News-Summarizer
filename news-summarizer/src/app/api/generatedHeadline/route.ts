@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import prisma from "../../../../prisma/prisma";
-import { getSchema, postSchema, updateSchema, deleteSchema } from "./schema";
 import { ZodError } from 'zod';
+import prisma from "../../../../prisma/prisma";
+import { deleteSchema, getSchema, postSchema, updateSchema } from "./schema";
 
 export const GET = async (req: Request) => {
     try {
@@ -28,11 +28,25 @@ export const GET = async (req: Request) => {
         });
     } catch (error) {
         if (error instanceof ZodError) {
-            console.error("Validation error:", error);
-            return NextResponse.json("Invalid input data", { status: 400 });
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
         }
         console.error("Error fetching generated headlines:", error);
-        return NextResponse.json("Failed to fetch generated headlines", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Failed to fetch generated headlines",
+            errors: error,
+        },
+        { status: 500 });
     }
 };
 
@@ -70,11 +84,25 @@ export const POST = async (req: Request) => {
 
     } catch (error) {
         if (error instanceof ZodError) {
-            console.error("Validation error:", error);
-            return NextResponse.json("Invalid input data", { status: 400 });
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
         }
         console.error("Error adding generated headline:", error);
-        return NextResponse.json("Failed to add generated headline", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Failed to add generated headline",
+            errors: error,
+        },
+        { status: 500 });
     }
 }
 
@@ -103,11 +131,25 @@ export const PATCH = async (req: Request) => {
 
     } catch (error) {
         if (error instanceof ZodError) {
-            console.error("Validation error:", error);
-            return NextResponse.json("Invalid input data", { status: 400 });
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
         }
         console.error("Error updating generated headline:", error);
-        return NextResponse.json("Failed to update generated headline", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Failed to update generated headline",
+            errors: error,
+        },
+        { status: 500 });
     }
 }
 
@@ -131,10 +173,24 @@ export const DELETE =async (req:Request) => {
 
     } catch (error) {
         if (error instanceof ZodError) {
-            console.error("Validation error:", error);
-            return NextResponse.json("Invalid input data", { status: 400 });
+            const errorMessages = error.errors.map(err => ({
+                field: err.path[0],
+                message: err.message,
+            }));
+
+            return NextResponse.json({
+                status: 400,
+                message: "Validation failed",
+                errors: errorMessages,
+            },
+            { status: 400 });
         }
         console.error("Error deleting generated headline:", error);
-        return NextResponse.json("Failed to delete generated headline", { status: 500 });
+        return NextResponse.json({
+            status: 500,
+            message: "Failed to delete generated headline",
+            errors: error,
+        },
+        { status: 500 });
     }
 }
