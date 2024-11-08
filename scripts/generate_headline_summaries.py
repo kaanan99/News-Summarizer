@@ -24,8 +24,7 @@ def generate_summary(headlines, system_message, client, model="gpt-4o-mini"):
 def main():
     # Get current date and variations
     current_date = datetime.now()
-    # date_dash = current_date.strftime("%Y-%m-%d")
-    date_dash = "2024-10-31"
+    date_dash = current_date.strftime("%Y-%m-%d")
     
     # Get API
     load_dotenv()
