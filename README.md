@@ -20,4 +20,6 @@ docker run --rm -p -d 3000:3000 news_summarizer
 docker build -f Dockerfile.script -t scripts .
 ```
 2. Run container:
-   
+```bash
+docker run -d scripts
+```
