@@ -9,6 +9,9 @@ from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from GoogleNews import GoogleNews
 from sentence_transformers import SentenceTransformer, util
+import logging
+
+logging.basicConfig(filename='/var/log/cron_python.log', level=logging.DEBUG)
 
 
 def main():
@@ -76,8 +79,8 @@ def main():
 
                 # Check the response
                 if response.status_code != 200:
-                    print("Failed to post:", response.status_code, response.text)
-                    print(data)
+                    logging.error("Failed to post:", response.status_code, response.text)
+                    logging.debug(data)
         
 
 if __name__ == "__main__":

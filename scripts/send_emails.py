@@ -15,6 +15,10 @@ from dotenv import load_dotenv
 from email.mime.text import MIMEText
 import base64
 from zoneinfo import ZoneInfo
+import logging
+from exceptions import TopicLoadException, HeadlineLoadException, NoHeadlinesException, UserLoadException
+
+logging.basicConfig(filename='/var/log/cron_python.log', level=logging.DEBUG)
 
 # Define SCOPES for sending email
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -32,7 +36,7 @@ def authenticate_gmail():
             try:
                 creds.refresh(google.auth.transport.requests.Request())
             except RefreshError:
-                print("The credentials have expired and could not be refreshed. Re-authenticating...")
+                logging.warning("The credentials have expired and could not be refreshed. Re-authenticating...")
                 creds = None
         if not creds:
             flow = InstalledAppFlow.from_client_secrets_file(
@@ -89,10 +93,10 @@ def send_email(service, sender, to, subject, message_text):
     message = create_message(sender, to, subject, message_text)
     try:
         message = (service.users().messages().send(userId="me", body=message).execute())
-        print(f"Message sent: {message['id']}")
+        logging.info(f"Message sent: {message['id']}")
         return message
     except Exception as error:
-        print(f"An error occurred while sending an email to {message['id']}: {error}")
+        logging.error(f"An error occurred while sending an email to {message['id']}: {error}")
 
 
 def main():
@@ -109,8 +113,7 @@ def main():
     # Get Topics
     response = requests.get(f"{api}/topics")
     if response.status_code != 200:
-        print("Error loading topics")
-        return
+        raise TopicLoadException
     topics = dict(response.json())["data"]
 
     topic_headlines = {}
@@ -125,13 +128,11 @@ def main():
     # Get Generated Headlines
     response = requests.get(f"{api}/generatedHeadline?date_added={date_dash}")
     if response.status_code != 200:
-        print("Error loading headlines")
-        return
+        raise HeadlineLoadException
     headlines = dict(response.json())["data"]
 
     if len(headlines) == 0:
-        print("No headlines to send")
-        return
+        raise NoHeadlinesException
 
     for headline in headlines:
         topic_id = headline["tid"]
@@ -153,8 +154,7 @@ def main():
     # Get users that are active
     response = requests.get(f"{api}/users?is_active=true")
     if response.status_code != 200:
-        print("Error loading users")
-        return
+        raise UserLoadException
     users = dict(response.json())["data"]
 
     # Authenticate and get Gmail API service
