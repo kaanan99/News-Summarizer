@@ -29,8 +29,8 @@ def main():
             break
 
 
-schedule.every().day.at("20:40", "US/Pacific").do(main)
+schedule.every().day.at("18:00", "US/Pacific").do(main)
 
 while True:
     schedule.run_pending()
-    time.sleep(3600)
+    time.sleep(60)
