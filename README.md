@@ -21,5 +21,5 @@ docker build -f Dockerfile.script -t scripts .
 ```
 2. Run container:
 ```bash
-docker run -d scripts
+docker run -d -v scripts/logs:logs scripts
 ```
