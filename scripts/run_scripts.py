@@ -29,7 +29,7 @@ def main():
             break
 
 
-schedule.every().day.at("20:30").do(main)
+schedule.every().day.at("20:40", "US/Pacific").do(main)
 
 while True:
     schedule.run_pending()
