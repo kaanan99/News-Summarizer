@@ -23,4 +23,4 @@ docker build -f Dockerfile.script -t scripts .
 ```bash
 docker run -d -v scripts/logs:logs scripts
 ```
-Make sure that you are in the home directory of this repo!
+**NOTE:** Make sure that you are in the home directory of this repo!
