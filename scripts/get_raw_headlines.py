@@ -60,7 +60,7 @@ def main():
 
         # Group the headlines together
         embeddings = model.encode(headlines)
-        clusters = util.community_detection(embeddings, min_community_size=3, threshold=0.6)
+        clusters = util.community_detection(embeddings, min_community_size=4, threshold=0.6)
         
         for group in range(len(clusters)):
             for index in clusters[group]:
