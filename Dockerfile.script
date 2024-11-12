@@ -8,14 +8,4 @@ WORKDIR scripts
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN apt-get update && apt-get install -y cron
-
-COPY crontab /etc/cron.d/mycron
-
-RUN chmod 0644 /etc/cron.d/mycron
-
-RUN crontab /etc/cron.d/mycron
-
-RUN touch /var/log/cron.log
-
-CMD ["cron", "-f"]
+CMD ["python", "run_scripts.py"]

@@ -9,7 +9,7 @@ from openai import OpenAI
 from zoneinfo import ZoneInfo
 import logging
 
-logging.basicConfig(filename='/var/log/cron_python.log', level=logging.DEBUG)
+logging.basicConfig(filename='/logs/scripts.log', level=logging.DEBUG)
 
 def generate_summary(headlines, system_message, client, model="gpt-4o-mini"):
     chat_completion = client.chat.completions.create(

@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 import logging
 from exceptions import TopicLoadException, HeadlineLoadException, NoHeadlinesException, UserLoadException
 
-logging.basicConfig(filename='/var/log/cron_python.log', level=logging.DEBUG)
+logging.basicConfig(filename='/logs/scripts.log', level=logging.DEBUG)
 
 # Define SCOPES for sending email
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']

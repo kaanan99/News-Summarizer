@@ -1,8 +1,10 @@
 import subprocess
 import sys
 import logging
+import schedule
+import time
 
-logging.basicConfig(filename='/var/log/cron_python.log', level=logging.DEBUG)
+logging.basicConfig(filename='/logs/scripts.log', level=logging.DEBUG)
 
 def run_script(script_name):
     result = subprocess.run([sys.executable, script_name], capture_output=True, text=True)
@@ -27,5 +29,8 @@ def main():
             break
 
 
-if __name__ == "__main__":
-    main()
+schedule.every().day.at("20:30").do(main)
+
+while True:
+    schedule.run_pending()
+    time.sleep(3600)

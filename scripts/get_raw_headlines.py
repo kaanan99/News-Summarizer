@@ -11,8 +11,7 @@ from GoogleNews import GoogleNews
 from sentence_transformers import SentenceTransformer, util
 import logging
 
-logging.basicConfig(filename='/var/log/cron_python.log', level=logging.DEBUG)
-
+logging.basicConfig(filename='/logs/scripts.log', level=logging.DEBUG)
 
 def main():
     # Get current date and variations
