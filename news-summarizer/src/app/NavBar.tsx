@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
           >
             About
           </a>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-400">
             {currentDateTime}
           </span>
         </div>
