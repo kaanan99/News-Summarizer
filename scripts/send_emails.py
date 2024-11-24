@@ -1,50 +1,12 @@
 import os
-import pickle
-import google.auth
-import google.auth.transport.requests
-from google.auth.exceptions import RefreshError
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from email.mime.multipart import MIMEMultipart
+import smtplib
 from email.mime.text import MIMEText
 import requests
 from datetime import datetime
 import string
 from dotenv import load_dotenv
-from email.mime.text import MIMEText
-import base64
 from zoneinfo import ZoneInfo
 
-# Define SCOPES for sending email
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-
-def authenticate_gmail():
-    creds = None
-    # Check if token.pickle exists and load the stored credentials from it
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            try:
-                creds.refresh(google.auth.transport.requests.Request())
-            except RefreshError:
-                print("The credentials have expired and could not be refreshed. Re-authenticating...")
-                creds = None
-        if not creds:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)  # Path to your credentials.json
-            creds = flow.run_local_server(port=0)
-        
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    service = build('gmail', 'v1', credentials=creds)
-    return service
 
 def create_html(header, headlines):
     headlines_html = ''.join(f"<li>{point}</li>" for point in headlines)
@@ -57,6 +19,7 @@ def create_html(header, headlines):
     </div>
     """
     return html_section
+
 
 def create_email_body(header, htmls):
     main_header = f"""
@@ -76,23 +39,16 @@ def create_email_body(header, htmls):
     """
     return full_html
 
-def create_message(sender, to, subject, message_text):
-    
+
+def send_email(subject, message_text, sender, recipient, password):
     message = MIMEText(message_text, 'html')
-    message['to'] = to
+    message['to'] = recipient
     message['from'] = sender
     message['subject'] = subject
-    raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
-    return {'raw': raw}
-
-def send_email(service, sender, to, subject, message_text):
-    message = create_message(sender, to, subject, message_text)
-    try:
-        message = (service.users().messages().send(userId="me", body=message).execute())
-        print(f"Message sent: {message['id']}")
-        return message
-    except Exception as error:
-        print(f"An error occurred while sending an email to {message['id']}: {error}")
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+       smtp_server.login(sender, password)
+       smtp_server.sendmail(sender, recipient, message.as_string())
+    print("Message sent!")
 
 
 def main():
@@ -100,11 +56,14 @@ def main():
     current_date = datetime.now(ZoneInfo('America/Los_Angeles'))
     date_slash = current_date.strftime("%m/%d/%Y")
     date_dash = current_date.strftime("%Y-%m-%d")
+    date_dash = "2024-11-22"
 
     # Load .env file and get environment variables
     load_dotenv()
     sender_email = os.getenv("SENDER_EMAIL")
     api = os.getenv("API")
+    sender_email = os.getenv("SENDER_EMAIL")
+    sender_password = os.getenv("SENDER_PASSWORD")
 
     # Get Topics
     response = requests.get(f"{api}/topics")
@@ -157,8 +116,6 @@ def main():
         return
     users = dict(response.json())["data"]
 
-    # Authenticate and get Gmail API service
-    service = authenticate_gmail()  
 
     for user in users:
         name = user["first_name"]
@@ -170,7 +127,7 @@ def main():
         topics_content = [topic_message[topic_id] for topic_id in user_topics]
         email_body = create_email_body(email_header, topics_content)
         
-        send_email(service, sender_email, email, subject, email_body)
+        send_email(subject, email_body, sender_email, email, sender_password)
 
 
 if __name__ == "__main__":
