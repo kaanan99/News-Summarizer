@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto flex items-center justify-between">
         <div
           onClick={() => router.push("/")}
-          className="text-lg font-bold text-gray-800">
+          className="text-lg font-bold text-gray-800 cursor-pointer">
           Kaanan & Kenny's Daily Newsletter
         </div>
 
