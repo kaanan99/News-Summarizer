@@ -56,7 +56,7 @@ def main():
     current_date = datetime.now(ZoneInfo('America/Los_Angeles'))
     date_slash = current_date.strftime("%m/%d/%Y")
     date_dash = current_date.strftime("%Y-%m-%d")
-    date_dash = "2024-11-22"
+
 
     # Load .env file and get environment variables
     load_dotenv()
