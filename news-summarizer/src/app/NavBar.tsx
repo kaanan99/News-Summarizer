@@ -1,9 +1,12 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Navbar: React.FC = () => {
   const [currentDateTime, setCurrentDateTime] = useState("");
+
+  const router = useRouter();
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -30,23 +33,25 @@ const Navbar: React.FC = () => {
   return (
     <nav className="bg-white-100 border-b border-gray-300 py-4 px-6">
       <div className="container mx-auto flex items-center justify-between">
-        <div className="text-lg font-bold text-gray-800">
+        <div
+          onClick={() => router.push("/")}
+          className="text-lg font-bold text-gray-800">
           Kaanan & Kenny's Daily Newsletter
         </div>
 
         <div className="flex items-center space-x-6">
-          <a
-            href="#"
-            className="text-sm font-medium text-gray-700 hover:underline"
+          <span
+            onClick={() => router.push("/todays-briefing")}
+            className="text-sm font-medium text-gray-700 hover:underline cursor-pointer"
           >
             Today's News
-          </a>
-          <a
-            href="#"
-            className="text-sm font-medium text-gray-700 hover:underline"
+          </span>
+          <span
+            onClick={() => router.push("/about")}
+            className="text-sm font-medium text-gray-700 hover:underline cursor-pointer"
           >
             About
-          </a>
+          </span>
           <span className="text-sm font-medium text-gray-400">
             {currentDateTime}
           </span>
