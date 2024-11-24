@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { z } from 'zod';
 import prisma from "../../../../prisma/prisma";
@@ -48,7 +49,7 @@ export const GET = async (req: Request) => {
             { status: 400 });
         }
 
-        console.error("Error fetching users:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Error fetching users",
@@ -97,7 +98,7 @@ export const POST = async (req: Request) => {
             { status: 400 });
         }
 
-        console.error("Error creating or updating user:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Error creating or updating user",
@@ -137,7 +138,7 @@ export const DELETE = async (req: Request) => {
             { status: 400 });
         }
 
-        console.error("Error deleting user:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
                 status: 500,
                 message: "Error deleting user",

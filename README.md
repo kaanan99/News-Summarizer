@@ -20,4 +20,7 @@ docker run --rm -p -d 3000:3000 news_summarizer
 docker build -f Dockerfile.script -t scripts .
 ```
 2. Run container:
-   
+```bash
+docker run -d -v /scripts/logs:/logs scripts
+```
+**NOTE:** Make sure that you are in the home directory of this repo!

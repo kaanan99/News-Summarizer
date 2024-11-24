@@ -9,7 +9,9 @@ from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from GoogleNews import GoogleNews
 from sentence_transformers import SentenceTransformer, util
+import logging
 
+logging.basicConfig(filename='/logs/scripts.log', level=logging.DEBUG)
 
 def main():
     # Get current date and variations
@@ -58,7 +60,7 @@ def main():
 
         # Group the headlines together
         embeddings = model.encode(headlines)
-        clusters = util.community_detection(embeddings, min_community_size=3, threshold=0.6)
+        clusters = util.community_detection(embeddings, min_community_size=4, threshold=0.6)
         
         for group in range(len(clusters)):
             for index in clusters[group]:
@@ -76,8 +78,8 @@ def main():
 
                 # Check the response
                 if response.status_code != 200:
-                    print("Failed to post:", response.status_code, response.text)
-                    print(data)
+                    logging.error("Failed to post:", response.status_code, response.text)
+                    logging.debug(data)
         
 
 if __name__ == "__main__":

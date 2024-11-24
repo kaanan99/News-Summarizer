@@ -7,7 +7,9 @@ from exceptions import TopicLoadException
 from dotenv import load_dotenv
 from openai import OpenAI
 from zoneinfo import ZoneInfo
+import logging
 
+logging.basicConfig(filename='/logs/scripts.log', level=logging.DEBUG)
 
 def generate_summary(headlines, system_message, client, model="gpt-4o-mini"):
     chat_completion = client.chat.completions.create(
@@ -64,13 +66,13 @@ def main():
         response = requests.get(f"{api}/rawHeadline", params=params)
         
         if response.status_code != 200:
-            print("Request failed:", response.status_code, response.text)
+            logging.error("Request failed:", response.status_code, response.text)
             continue
         
         headline_objs = dict(response.json())["data"]
 
         if len(headline_objs) == 0:
-            print(f"No raw headlines for topic id: {topic_id}")
+            logging.error(f"No raw headlines for topic id: {topic_id}")
             continue
 
         # Combine headlines within a group
@@ -99,8 +101,8 @@ def main():
 
             # Check the response
             if response.status_code != 200:
-                print("Failed to post:", response.status_code, response.text)
-                print(data)
+                logging.error("Failed to post:", response.status_code, response.text)
+                logging.debug(data)
 
     
         

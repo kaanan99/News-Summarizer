@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import { ZodError } from 'zod';
 import prisma from "../../../../prisma/prisma";
@@ -41,7 +42,7 @@ export const GET = async (req: Request) => {
             },
             { status: 400 });
         }
-        console.error("Error fetching raw headlines:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to fetch raw headlines",
@@ -97,7 +98,7 @@ export const POST = async (req: Request) => {
             },
             { status: 400 });
         }
-        console.error("Error adding raw headline:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to add raw headlines",
@@ -146,7 +147,7 @@ export const PATCH = async (req: Request) => {
             },
             { status: 400 });
         }
-        console.error("Error updating raw headline:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to add raw headlines",
@@ -188,7 +189,7 @@ export const DELETE =async (req:Request) => {
             },
             { status: 400 });
         }
-        console.error("Error deleting raw headline:", error);
+        Sentry.captureException(error);
         return NextResponse.json({
             status: 500,
             message: "Failed to add raw headlines",

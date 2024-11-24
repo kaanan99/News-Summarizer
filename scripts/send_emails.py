@@ -6,6 +6,10 @@ from datetime import datetime
 import string
 from dotenv import load_dotenv
 from zoneinfo import ZoneInfo
+import logging
+from exceptions import TopicLoadException, HeadlineLoadException, NoHeadlinesException, UserLoadException
+
+logging.basicConfig(filename='/logs/scripts.log', level=logging.DEBUG)
 
 
 def create_html(header, headlines):
@@ -68,8 +72,7 @@ def main():
     # Get Topics
     response = requests.get(f"{api}/topics")
     if response.status_code != 200:
-        print("Error loading topics")
-        return
+        raise TopicLoadException
     topics = dict(response.json())["data"]
 
     topic_headlines = {}
@@ -84,13 +87,11 @@ def main():
     # Get Generated Headlines
     response = requests.get(f"{api}/generatedHeadline?date_added={date_dash}")
     if response.status_code != 200:
-        print("Error loading headlines")
-        return
+        raise HeadlineLoadException
     headlines = dict(response.json())["data"]
 
     if len(headlines) == 0:
-        print("No headlines to send")
-        return
+        raise NoHeadlinesException
 
     for headline in headlines:
         topic_id = headline["tid"]
@@ -112,8 +113,7 @@ def main():
     # Get users that are active
     response = requests.get(f"{api}/users?is_active=true")
     if response.status_code != 200:
-        print("Error loading users")
-        return
+        raise UserLoadException
     users = dict(response.json())["data"]
 
 

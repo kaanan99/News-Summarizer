@@ -8,4 +8,4 @@ WORKDIR scripts
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["bash"]
+CMD ["python", "run_scripts.py"]
