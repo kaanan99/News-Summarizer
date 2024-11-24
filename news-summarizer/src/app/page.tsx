@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 export default function Home() {
@@ -7,6 +8,8 @@ export default function Home() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
+  const router = useRouter();
+  
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent the default form submission
 
@@ -25,7 +28,11 @@ export default function Home() {
 
       if (response.ok) {
         console.log("added user!")
-        setEmail(""); // Clear the input field
+         // Clear the input field
+        setEmail("");
+        setFirstName("");
+        setLastName("");
+        router.push("/thank-you");
       } else {
         const errorData = await response.json();
         console.log(`Error: ${errorData.message || "Failed to subscribe."}`);
